@@ -1,0 +1,409 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #1f1f1f;
+  color: #ffffff;
+}
+
+/* =========================
+   Header
+========================= */
+
+.topbar {
+  background: #1565ff;
+  color: #fff;
+  padding: 18px 20px;
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+}
+
+.logo {
+  font-size: 34px;
+  font-weight: bold;
+}
+
+#statusText {
+  font-size: 20px;
+}
+
+/* =========================
+   Container
+========================= */
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 16px;
+}
+
+/* =========================
+   Screen
+========================= */
+
+.screen {
+  
+  height: 430px;
+  
+  background: #2d2d2d;
+  
+  border: 3px dashed #555;
+  
+  border-radius: 14px;
+  
+  display: flex;
+  
+  justify-content: center;
+  
+  align-items: center;
+  
+  overflow: hidden;
+  
+  position: relative;
+  
+  margin-bottom: 22px;
+}
+
+#welcome {
+  
+  text-align: center;
+  
+  color: #cfcfcf;
+  
+  padding: 20px;
+}
+
+#welcome h1 {
+  
+  font-size: 54px;
+  
+  margin-bottom: 16px;
+}
+
+#welcome p {
+  
+  font-size: 26px;
+}
+
+/* =========================
+   Players
+========================= */
+
+#imagePlayer,
+#videoPlayer {
+  
+  display: none;
+  
+  width: 100%;
+  
+  height: 100%;
+  
+  object-fit: contain;
+  
+  background: #000;
+}
+
+/* =========================
+   Toolbar
+========================= */
+
+.toolbar {
+  
+  display: flex;
+  
+  flex-wrap: wrap;
+  
+  justify-content: center;
+  
+  gap: 14px;
+  
+  margin-bottom: 22px;
+}
+
+.toolbar button {
+  
+  background: #1565ff;
+  
+  color: white;
+  
+  border: none;
+  
+  border-radius: 10px;
+  
+  padding: 15px 24px;
+  
+  font-size: 20px;
+  
+  cursor: pointer;
+  
+  transition: .2s;
+}
+
+.toolbar button:hover {
+  
+  background: #0f4fd6;
+}
+
+.toolbar button:active {
+  
+  transform: scale(.96);
+}
+
+/* =========================
+   Playlist
+========================= */
+
+.playlistBox {
+  
+  background: #2d2d2d;
+  
+  border-radius: 12px;
+  
+  padding: 18px;
+}
+
+.playlistBox h2 {
+  
+  font-size: 34px;
+  
+  margin-bottom: 18px;
+}
+
+#playlist {
+  
+  list-style: none;
+}
+
+.playlistItem {
+  
+  display: flex;
+  
+  align-items: center;
+  
+  gap: 12px;
+  
+  background: #3a3a3a;
+  
+  margin-bottom: 10px;
+  
+  padding: 12px;
+  
+  border-radius: 8px;
+}
+
+.title {
+  
+  flex: 1;
+  
+  cursor: pointer;
+  
+  word-break: break-word;
+}
+
+.deleteBtn {
+  
+  background: #e53935;
+  
+  color: white;
+  
+  border: none;
+  
+  border-radius: 6px;
+  
+  padding: 6px 12px;
+  
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  
+  background: #b71c1c;
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media(max-width:700px) {
+  
+  .logo {
+    
+    font-size: 22px;
+  }
+  
+  #statusText {
+    
+    font-size: 16px;
+  }
+  
+  .screen {
+    
+    height: 330px;
+  }
+  
+  #welcome h1 {
+    
+    font-size: 30px;
+  }
+  
+  #welcome p {
+    
+    font-size: 18px;
+  }
+  
+  .toolbar button {
+    
+    font-size: 18px;
+    
+    flex: 1;
+  }
+  
+  .playlistBox h2 {
+    
+    font-size: 28px;
+  }
+  
+}
+#playlist li.active {
+  background: #1565ff;
+  color: white;
+}
+
+/* =========================
+   Presentation Mode (Final)
+========================= */
+
+.presentation-mode .topbar,
+.presentation-mode .playlistBox {
+  display: none !important;
+}
+
+.presentation-mode .container {
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.presentation-mode .screen {
+  height: 100vh;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+}
+
+.presentation-mode .toolbar {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: transparent;
+  justify-content: center;
+  display: flex;
+  padding: 10px;
+}
+
+.presentation-mode .toolbar button {
+  display: none;
+}
+
+.presentation-mode #exitPresentationBtn {
+  display: inline-block;
+  background: #e53935 !important;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 15px 24px;
+  font-size: 20px;
+}
+
+/* वीडियो कंट्रोल छिपाना */
+.presentation-mode video {
+  pointer-events: none;
+}
+
+.presentation-mode video::-webkit-media-controls,
+.presentation-mode video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+.presentation-mode #imageDuration {
+  display: none !important;
+}
+
+.presentation-mode #tickerInput,
+.presentation-mode #tickerSaveBtn {
+  display: none !important;
+}
+
+/* =========================
+   Clock
+========================= */
+.clock {
+  position: fixed;
+  top: 70px;                  /* हेडर के नीचे */
+  right: 15px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 1000;
+  font-family: Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.presentation-mode .clock {
+  top: 20px;
+  right: 20px;
+  font-size: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px 16px;
+}
+
+/* =========================
+   Ticker (Scrolling Text)
+========================= */
+.ticker-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #1565ff;
+  color: white;
+  overflow: hidden;
+  height: 42px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+}
+
+.ticker {
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: scroll-left 20s linear infinite;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.presentation-mode .ticker-wrap {
+  height: 48px;
+}
+
+.presentation-mode .ticker {
+  font-size: 20px;
+}
