@@ -14,6 +14,21 @@
 
 <body>
 
+<!-- ========================= -->
+<!-- Password Lock Screen -->
+<!-- ========================= -->
+<div id="lockScreen" class="lockScreen">
+    <div class="lockBox">
+        <h2>🔒 IMTEYAZ SHOPPING</h2>
+        <p>Password डालें</p>
+        <input type="password" id="lockPassword" placeholder="Password" autocomplete="off">
+        <button id="lockSubmitBtn">Unlock</button>
+        <p id="lockError" class="lockError"></p>
+    </div>
+</div>
+
+<div id="appContent" class="appContent" style="display:none;">
+
 <header class="topbar">
 
     <div class="logo">
@@ -147,6 +162,7 @@
 
 </div>
 
+</div><!-- /appContent -->
 
 <script src="script.js"></script>
 

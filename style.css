@@ -407,3 +407,72 @@ body {
 .presentation-mode .ticker {
   font-size: 20px;
 }
+/* =========================
+   Password Lock Screen
+========================= */
+.lockScreen {
+  position: fixed;
+  inset: 0;
+  background: #101010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 20px;
+}
+
+.lockBox {
+  background: #2d2d2d;
+  border-radius: 14px;
+  padding: 36px 30px;
+  text-align: center;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+}
+
+.lockBox h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.lockBox p {
+  color: #cfcfcf;
+  margin-bottom: 18px;
+  font-size: 15px;
+}
+
+.lockBox input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.lockBox button {
+  width: 100%;
+  background: #1565ff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-size: 17px;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.lockBox button:hover {
+  background: #0f4fd6;
+}
+
+.lockError {
+  color: #ff5252;
+  margin-top: 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  min-height: 18px;
+}

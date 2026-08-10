@@ -1,3 +1,44 @@
+// =========================
+// Password Lock
+// =========================
+// यहाँ अपना password बदल सकते हैं
+const DSS_PASSWORD = "IMTEYAZ786";
+const SESSION_KEY = "DSS_UNLOCKED";
+
+window.addEventListener("DOMContentLoaded", () => {
+  const lockScreen = document.getElementById("lockScreen");
+  const appContent = document.getElementById("appContent");
+  const lockPassword = document.getElementById("lockPassword");
+  const lockSubmitBtn = document.getElementById("lockSubmitBtn");
+  const lockError = document.getElementById("lockError");
+
+  function unlockApp() {
+    lockScreen.style.display = "none";
+    appContent.style.display = "block";
+  }
+
+  // इसी browser tab में दोबारा password न मांगे (session भर के लिए)
+  if (sessionStorage.getItem(SESSION_KEY) === "yes") {
+    unlockApp();
+  }
+
+  function tryUnlock() {
+    if (lockPassword.value === DSS_PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, "yes");
+      lockError.textContent = "";
+      unlockApp();
+    } else {
+      lockError.textContent = "❌ गलत Password, दोबारा कोशिश करें";
+      lockPassword.value = "";
+    }
+  }
+
+  lockSubmitBtn.addEventListener("click", tryUnlock);
+  lockPassword.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") tryUnlock();
+  });
+});
+
 window.addEventListener("DOMContentLoaded", () => {
 
   // =========================
