@@ -1,48 +1,19 @@
 // =========================
 // Password Lock
 // =========================
-// यहाँ अपना password बदल सकते हैं
 const DSS_PASSWORD = "IMTEYAZ786";
 const SESSION_KEY = "DSS_UNLOCKED";
 
 window.addEventListener("DOMContentLoaded", () => {
+
   const lockScreen = document.getElementById("lockScreen");
   const appContent = document.getElementById("appContent");
   const lockPassword = document.getElementById("lockPassword");
   const lockSubmitBtn = document.getElementById("lockSubmitBtn");
   const lockError = document.getElementById("lockError");
 
-  function unlockApp() {
-    lockScreen.style.display = "none";
-    appContent.style.display = "block";
-  }
-
-  // इसी browser tab में दोबारा password न मांगे (session भर के लिए)
-  if (sessionStorage.getItem(SESSION_KEY) === "yes") {
-    unlockApp();
-  }
-
-  function tryUnlock() {
-    if (lockPassword.value === DSS_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, "yes");
-      lockError.textContent = "";
-      unlockApp();
-    } else {
-      lockError.textContent = "❌ गलत Password, दोबारा कोशिश करें";
-      lockPassword.value = "";
-    }
-  }
-
-  lockSubmitBtn.addEventListener("click", tryUnlock);
-  lockPassword.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") tryUnlock();
-  });
-});
-
-window.addEventListener("DOMContentLoaded", () => {
-
   // =========================
-  // Buttons
+  // Elements
   // =========================
   const addBtn = document.getElementById("addBtn");
   const playBtn = document.getElementById("playBtn");
@@ -51,24 +22,27 @@ window.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("nextBtn");
   const saveBtn = document.getElementById("saveBtn");
   const loadBtn = document.getElementById("loadBtn");
-  const playlistLoader = document.getElementById("playlistLoader");
   const fullscreenBtn = document.getElementById("fullscreenBtn");
+  const exitBtn = document.getElementById("exitPresentationBtn");
   const muteBtn = document.getElementById("muteBtn");
+  const settingsBtn = document.getElementById("settingsBtn");
+  const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+  const toggleControlsBtn = document.getElementById("toggleControlsBtn");
+  const controlsPanel = document.getElementById("controlsPanel");
+  const settingsPanel = document.getElementById("settingsPanel");
 
-
-  // =========================
-  // Media
-  // =========================
   const filePicker = document.getElementById("filePicker");
+  const qrFile = document.getElementById("qrFile");
   const imagePlayer = document.getElementById("imagePlayer");
   const videoPlayer = document.getElementById("videoPlayer");
   const welcome = document.getElementById("welcome");
-
-  // =========================
-  // Playlist
-  // =========================
   const playlist = document.getElementById("playlist");
   const statusText = document.getElementById("statusText");
+  const tickerInput = document.getElementById("tickerInput");
+  const tickerText = document.getElementById("tickerText");
+  const tickerSaveBtn = document.getElementById("tickerSaveBtn");
+  const qrBox = document.getElementById("qrBox");
+  const qrImage = document.getElementById("qrImage");
 
   // =========================
   // Variables
@@ -76,30 +50,21 @@ window.addEventListener("DOMContentLoaded", () => {
   let media = [];
   let current = -1;
   let slideTimer = null;
-  const imageDuration = document.getElementById("imageDuration");
-  let imageTime = 5000; // डिफ़ॉल्ट 5 सेकंड
-
-  // यूज़र ने वीडियो को Unmute किया है या नहीं — यह याद रखा जाएगा
-  // ताकि अगली हर वीडियो पर यही स्थिति लागू हो (सिर्फ़ पहली वीडियो
-  // हमेशा browser की autoplay policy की वजह से muted शुरू होगी)
   let userWantsSound = false;
-
-  // पिछली object URL को याद रखते हैं ताकि मीडिया बदलते समय उसे
-  // हटा (revoke) सकें और memory leak न हो
   let currentObjectUrl = null;
+  let hideTimer = null;
 
   // =========================
-  // IndexedDB (असली फ़ाइलें सेव करने के लिए)
+  // IndexedDB
   // =========================
   const DB_NAME = "DSS_DB";
-  const DB_VERSION = 1;
   const STORE_NAME = "playlist";
   let dbPromise = null;
 
   function openDB() {
     if (dbPromise) return dbPromise;
     dbPromise = new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      const request = indexedDB.open(DB_NAME, 1);
       request.onupgradeneeded = () => {
         const db = request.result;
         if (!db.objectStoreNames.contains(STORE_NAME)) {
@@ -112,14 +77,19 @@ window.addEventListener("DOMContentLoaded", () => {
     return dbPromise;
   }
 
-  async function savePlaylistToDB(files) {
+  async function savePlaylistToDB(items) {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, "readwrite");
       const store = tx.objectStore(STORE_NAME);
-      store.clear(); // पुराना playlist हटाकर नया सेव करेंगे
-      files.forEach((file) => {
-        store.add({ name: file.name, type: file.type, blob: file });
+      store.clear();
+      items.forEach((item) => {
+        store.add({
+          name: item.file.name,
+          type: item.file.type,
+          blob: item.file,
+          duration: item.duration || 5
+        });
       });
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
@@ -137,105 +107,148 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // पेज खुलते ही पहले से सेव प्लेलिस्ट अपने आप लोड करें
+  // =========================
+  // Unlock
+  // =========================
+  function unlockApp() {
+    lockScreen.style.display = "none";
+    appContent.style.display = "block";
+
+    setTimeout(() => {
+      if (media.length > 0) {
+        enterPresentation();
+        if (current === -1) show(0);
+      }
+    }, 700);
+  }
+
+  if (sessionStorage.getItem(SESSION_KEY) === "yes") {
+    unlockApp();
+  }
+
+  function tryUnlock() {
+    if (lockPassword.value === DSS_PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, "yes");
+      lockError.textContent = "";
+      unlockApp();
+    } else {
+      lockError.textContent = "❌ गलत Password";
+      lockPassword.value = "";
+    }
+  }
+
+  lockSubmitBtn.addEventListener("click", tryUnlock);
+  lockPassword.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") tryUnlock();
+  });
+
+  // =========================
+  // Auto load playlist
+  // =========================
   (async function autoLoadOnStart() {
     try {
       const rows = await loadPlaylistFromDB();
       if (rows.length > 0) {
-        media = rows.map((row) => new File([row.blob], row.name, { type: row.type }));
+        media = rows.map((row) => ({
+          file: new File([row.blob], row.name, { type: row.type }),
+          duration: row.duration || 5
+        }));
         refreshPlaylist();
         statusText.textContent = `Playlist loaded (${media.length} items)`;
       }
     } catch (err) {
-      console.error("पुरानी playlist लोड नहीं हो सकी:", err);
+      console.error(err);
     }
   })();
 
   // =========================
   // Add Media
   // =========================
-  addBtn.addEventListener("click", () => {
-    filePicker.click();
-  });
+  addBtn.addEventListener("click", () => filePicker.click());
 
   filePicker.addEventListener("change", (e) => {
     const files = Array.from(e.target.files);
     files.forEach(file => {
-      media.push(file);
+      media.push({ file: file, duration: 5 });
     });
     refreshPlaylist();
-    if (current === -1 && media.length > 0) {
-      show(0);
-    }
-    filePicker.value = ""; // ताकि वही फ़ाइल दोबारा चुनने पर भी change event चले
+    if (current === -1 && media.length > 0) show(0);
+    filePicker.value = "";
   });
 
   // =========================
-  // Show Media
+  // Show Media (with fade)
   // =========================
   function show(index) {
     clearTimeout(slideTimer);
-
     if (index < 0 || index >= media.length) return;
 
     current = index;
-    const file = media[current];
+    const item = media[current];
+    const file = item.file;
+    const duration = (item.duration || 5) * 1000;
 
     welcome.style.display = "none";
-    imagePlayer.style.display = "none";
     videoPlayer.style.display = "none";
     videoPlayer.pause();
 
-    // पुरानी object URL को हटाएं ताकि memory leak न हो
-    if (currentObjectUrl) {
-      URL.revokeObjectURL(currentObjectUrl);
-    }
+    if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
     const url = URL.createObjectURL(file);
     currentObjectUrl = url;
 
-    document.querySelectorAll("#playlist li").forEach((item, i) => {
-      item.classList.toggle("active", i === current);
+    document.querySelectorAll("#playlist li").forEach((li, i) => {
+      li.classList.toggle("active", i === current);
     });
 
     if (file.type.startsWith("image")) {
-      imagePlayer.src = url;
-      imagePlayer.style.display = "block";
-      statusText.textContent = `Image ${current + 1} / ${media.length}`;
-      slideTimer = setTimeout(nextMedia, imageTime);
+      imagePlayer.classList.add("fade-out");
+      setTimeout(() => {
+        imagePlayer.src = url;
+        imagePlayer.style.display = "block";
+        imagePlayer.classList.remove("fade-out");
+        statusText.textContent = `Image ${current + 1} / ${media.length}`;
+        slideTimer = setTimeout(nextMedia, duration);
+      }, 600);
     } else {
+      imagePlayer.style.display = "none";
       videoPlayer.src = url;
       videoPlayer.style.display = "block";
-
-      // पहली बार autoplay policy के कारण muted रखना ज़रूरी है,
-      // लेकिन अगर यूज़र पहले Unmute कर चुका है तो वही स्थिति बनाए रखें
       videoPlayer.muted = !userWantsSound;
-
       statusText.textContent = `Video ${current + 1} / ${media.length}`;
       videoPlayer.load();
       videoPlayer.play().catch(() => {
-        // अगर unmuted autoplay ब्राउज़र ने रोक दिया, तो mute करके फिर कोशिश करें
         videoPlayer.muted = true;
         videoPlayer.play();
       });
-
-      muteBtn.textContent = videoPlayer.muted ? "🔇 Mute" : "🔊 Unmute";
+      muteBtn.textContent = videoPlayer.muted ? "🔇" : "🔊";
     }
   }
+
   // =========================
   // Refresh Playlist
   // =========================
   function refreshPlaylist() {
     playlist.innerHTML = "";
-
-    media.forEach((file, index) => {
+    media.forEach((item, index) => {
       const li = document.createElement("li");
       li.className = "playlistItem";
 
       const title = document.createElement("span");
       title.className = "title";
-      title.textContent = file.name;
-      title.addEventListener("click", () => {
-        show(index);
+      title.textContent = item.file.name;
+      title.addEventListener("click", () => show(index));
+
+      const timeInput = document.createElement("input");
+      timeInput.type = "number";
+      timeInput.min = "1";
+      timeInput.max = "300";
+      timeInput.value = item.duration || 5;
+      timeInput.style.width = "55px";
+      timeInput.style.padding = "3px";
+      timeInput.style.borderRadius = "4px";
+      timeInput.style.border = "none";
+      timeInput.addEventListener("change", () => {
+        item.duration = Number(timeInput.value) || 5;
       });
 
       const deleteBtn = document.createElement("button");
@@ -244,7 +257,6 @@ window.addEventListener("DOMContentLoaded", () => {
       deleteBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         media.splice(index, 1);
-
         if (media.length === 0) {
           current = -1;
           welcome.style.display = "block";
@@ -252,192 +264,163 @@ window.addEventListener("DOMContentLoaded", () => {
           videoPlayer.style.display = "none";
           statusText.textContent = "Ready";
         } else {
-          if (current >= media.length) {
-            current = media.length - 1;
-          }
-          if (current >= 0) {
-            show(current);
-          }
+          if (current >= media.length) current = media.length - 1;
+          if (current >= 0) show(current);
         }
         refreshPlaylist();
       });
 
       li.appendChild(title);
+      li.appendChild(timeInput);
       li.appendChild(deleteBtn);
       playlist.appendChild(li);
     });
   }
 
   // =========================
-  // Next
+  // Next / Prev
   // =========================
   function nextMedia() {
     if (media.length === 0) return;
-    current++;
-    if (current >= media.length) {
-      current = 0;
-    }
+    current = (current + 1) % media.length;
     show(current);
   }
 
-  // =========================
-  // Previous
-  // =========================
   function prevMedia() {
     if (media.length === 0) return;
-    current--;
-    if (current < 0) {
-      current = media.length - 1;
-    }
+    current = (current - 1 + media.length) % media.length;
     show(current);
   }
 
-  // =========================
-  // Buttons
-  // =========================
   playBtn.addEventListener("click", () => {
-    if (videoPlayer.style.display === "block") {
-      videoPlayer.play();
-    }
+    if (videoPlayer.style.display === "block") videoPlayer.play();
   });
-
   pauseBtn.addEventListener("click", () => {
-    if (videoPlayer.style.display === "block") {
-      videoPlayer.pause();
+    if (videoPlayer.style.display === "block") videoPlayer.pause();
+  });
+  nextBtn.addEventListener("click", nextMedia);
+  prevBtn.addEventListener("click", prevMedia);
+  videoPlayer.addEventListener("ended", nextMedia);
+
+  // =========================
+  // Save / Load
+  // =========================
+  saveBtn.addEventListener("click", async () => {
+    if (media.length === 0) return alert("Playlist is empty!");
+    try {
+      await savePlaylistToDB(media);
+      alert("✅ Playlist Saved");
+    } catch (err) {
+      alert("Save failed");
     }
   });
 
-  nextBtn.addEventListener("click", () => {
-    nextMedia();
-  });
-
-  prevBtn.addEventListener("click", () => {
-    prevMedia();
-  });
-
-  // =========================
-  // Auto Next Video
-  // =========================
-  videoPlayer.addEventListener("ended", () => {
-    nextMedia();
-  });
-
-  // =========================
-  // Load Playlist (अब पुराने "फिर से चुनो" तरीके की जगह
-  // सीधे IndexedDB से पहले से सेव प्लेलिस्ट लोड होती है)
-  // =========================
   loadBtn.addEventListener("click", async () => {
     try {
       const rows = await loadPlaylistFromDB();
-      if (rows.length === 0) {
-        alert("कोई सेव की हुई Playlist नहीं मिली");
-        return;
-      }
-      media = rows.map((row) => new File([row.blob], row.name, { type: row.type }));
+      if (rows.length === 0) return alert("No saved playlist");
+      media = rows.map((row) => ({
+        file: new File([row.blob], row.name, { type: row.type }),
+        duration: row.duration || 5
+      }));
       refreshPlaylist();
       current = -1;
       show(0);
-      alert("✅ Playlist Loaded Successfully");
+      alert("✅ Playlist Loaded");
     } catch (err) {
-      console.error(err);
-      alert("Playlist लोड नहीं हो सकी");
+      alert("Load failed");
     }
   });
 
   // =========================
-  // Save Playlist (अब असली फ़ाइलें IndexedDB में सेव होती हैं,
-  // सिर्फ़ नाम नहीं — इसलिए Load करने पर मीडिया वापस मिलेगा)
+  // Presentation Mode
   // =========================
-  saveBtn.addEventListener("click", async () => {
-    if (media.length === 0) {
-      alert("Playlist is empty!");
-      return;
-    }
-    try {
-      await savePlaylistToDB(media);
-      alert("✅ Playlist Saved Successfully");
-    } catch (err) {
-      console.error(err);
-      alert("Playlist सेव नहीं हो सकी");
-    }
-  });
-
-  // =========================
-  // Presentation Mode (अब असली Fullscreen API के साथ)
-  // =========================
-  const exitBtn = document.getElementById("exitPresentationBtn");
-  const fullBtn = document.getElementById("fullscreenBtn");
-  let hideTimer = null;
-
   function showExitButton() {
     exitBtn.style.display = "inline-block";
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => {
-      exitBtn.style.display = "none";
-    }, 4000); // 4 सेकंड बाद छिप जाएगा
+      // optional: hide after time
+    }, 4000);
   }
 
   function enterPresentation() {
     document.body.classList.add("presentation-mode");
     const el = document.documentElement;
-    const request = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-    if (request) {
-      request.call(el).catch(() => {
-        // कुछ ब्राउज़र/डिवाइस असली fullscreen की इजाज़त नहीं देते,
-        // उस स्थिति में सिर्फ़ CSS presentation-mode ही काम करेगा
-      });
-    }
+    const request = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (request) request.call(el).catch(() => {});
     showExitButton();
   }
 
   function exitPresentation() {
     document.body.classList.remove("presentation-mode");
-    exitBtn.style.display = ""; // रीसेट
-    clearTimeout(hideTimer);
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
+    if (document.fullscreenElement) {
       const exit = document.exitFullscreen || document.webkitExitFullscreen;
       if (exit) exit.call(document).catch(() => {});
     }
   }
 
-  fullBtn.addEventListener("click", enterPresentation);
+  fullscreenBtn.addEventListener("click", enterPresentation);
   exitBtn.addEventListener("click", exitPresentation);
 
-  // अगर यूज़र Esc दबाकर या सिस्टम जेस्चर से fullscreen से बाहर आ जाए,
-  // तो presentation-mode भी अपने आप हट जाए
   document.addEventListener("fullscreenchange", () => {
     if (!document.fullscreenElement) {
       document.body.classList.remove("presentation-mode");
-      clearTimeout(hideTimer);
     }
   });
 
-  // स्क्रीन पर टैप करने से Exit बटन फिर से दिखे
-  document.querySelector(".screen").addEventListener("click", function () {
-    if (document.body.classList.contains("presentation-mode")) {
-      showExitButton();
-    }
-  });
-
-  // इमेज ड्यूरेशन बदलना
-  imageDuration.addEventListener("change", function () {
-    imageTime = Number(imageDuration.value) * 1000;
+  // =========================
+  // Side Controls Toggle
+  // =========================
+  toggleControlsBtn.addEventListener("click", () => {
+    controlsPanel.classList.toggle("show");
   });
 
   // =========================
-  // Mute / Unmute
-  // (अब यह स्थिति अगली सभी videos पर भी लागू रहेगी)
+  // Settings Panel
   // =========================
-  muteBtn.addEventListener("click", function () {
+  settingsBtn.addEventListener("click", () => {
+    settingsPanel.classList.add("show");
+    controlsPanel.classList.remove("show");
+  });
+
+  closeSettingsBtn.addEventListener("click", () => {
+    settingsPanel.classList.remove("show");
+  });
+
+  // =========================
+  // Mute
+  // =========================
+  muteBtn.addEventListener("click", () => {
     if (videoPlayer.muted) {
       videoPlayer.muted = false;
       userWantsSound = true;
-      muteBtn.textContent = "🔊 Unmute";
+      muteBtn.textContent = "🔊";
     } else {
       videoPlayer.muted = true;
       userWantsSound = false;
-      muteBtn.textContent = "🔇 Mute";
+      muteBtn.textContent = "🔇";
     }
+  });
+
+  // =========================
+  // QR Code
+  // =========================
+  // पहले से सेव QR लोड करें
+  const savedQR = localStorage.getItem("DSS_QR");
+  if (savedQR) {
+    qrImage.src = savedQR;
+  }
+
+  qrFile.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      qrImage.src = reader.result;
+      localStorage.setItem("DSS_QR", reader.result);
+      alert("✅ QR Code सेव हो गया");
+    };
+    reader.readAsDataURL(file);
   });
 
   // =========================
@@ -445,50 +428,26 @@ window.addEventListener("DOMContentLoaded", () => {
   // =========================
   function updateClock() {
     const now = new Date();
-
-    const time = now.toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    });
-
-    const date = now.toLocaleDateString('en-IN', {
-      weekday: 'short',
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
-
+    const time = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    const date = now.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
     const clock = document.getElementById("clock");
-    if (clock) {
-      clock.textContent = time + " | " + date;
-    }
+    if (clock) clock.textContent = time + " | " + date;
   }
-
   updateClock();
   setInterval(updateClock, 1000);
 
   // =========================
-  // Ticker Text
+  // Ticker
   // =========================
-  const tickerInput = document.getElementById("tickerInput");
-  const tickerText = document.getElementById("tickerText");
-  const tickerSaveBtn = document.getElementById("tickerSaveBtn");
-
-  // पहले से सेव किया हुआ मैसेज लोड करें
   const savedTicker = localStorage.getItem("DSS_TICKER");
   if (savedTicker) {
     tickerText.textContent = savedTicker;
     tickerInput.value = savedTicker;
   }
 
-  tickerSaveBtn.addEventListener("click", function () {
+  tickerSaveBtn.addEventListener("click", () => {
     const message = tickerInput.value.trim();
-    if (message === "") {
-      alert("कृपया कुछ लिखें");
-      return;
-    }
+    if (!message) return alert("कृपया कुछ लिखें");
     tickerText.textContent = message;
     localStorage.setItem("DSS_TICKER", message);
     alert("✅ Ticker सेव हो गया");

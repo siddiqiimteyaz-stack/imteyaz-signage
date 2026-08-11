@@ -13,32 +13,28 @@ body {
 /* =========================
    Header
 ========================= */
-
 .topbar {
   background: #1565ff;
   color: #fff;
-  padding: 18px 20px;
-  
+  padding: 14px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
   box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
 }
 
 .logo {
-  font-size: 34px;
+  font-size: 26px;
   font-weight: bold;
 }
 
 #statusText {
-  font-size: 20px;
+  font-size: 16px;
 }
 
 /* =========================
    Container
 ========================= */
-
 .container {
   max-width: 900px;
   margin: auto;
@@ -48,238 +44,295 @@ body {
 /* =========================
    Screen
 ========================= */
-
 .screen {
-  
   height: 430px;
-  
   background: #2d2d2d;
-  
   border: 3px dashed #555;
-  
   border-radius: 14px;
-  
   display: flex;
-  
   justify-content: center;
-  
   align-items: center;
-  
   overflow: hidden;
-  
   position: relative;
-  
   margin-bottom: 22px;
 }
 
 #welcome {
-  
   text-align: center;
-  
   color: #cfcfcf;
-  
   padding: 20px;
 }
 
 #welcome h1 {
-  
-  font-size: 54px;
-  
-  margin-bottom: 16px;
+  font-size: 42px;
+  margin-bottom: 14px;
 }
 
 #welcome p {
-  
-  font-size: 26px;
+  font-size: 20px;
 }
-
-/* =========================
-   Players
-========================= */
 
 #imagePlayer,
 #videoPlayer {
-  
   display: none;
-  
   width: 100%;
-  
   height: 100%;
-  
   object-fit: contain;
-  
   background: #000;
 }
 
-/* =========================
-   Toolbar
-========================= */
-
-.toolbar {
-  
-  display: flex;
-  
-  flex-wrap: wrap;
-  
-  justify-content: center;
-  
-  gap: 14px;
-  
-  margin-bottom: 22px;
+/* फे़ड इफेक्ट */
+#imagePlayer {
+  transition: opacity 0.7s ease;
+  opacity: 1;
 }
 
-.toolbar button {
-  
-  background: #1565ff;
-  
-  color: white;
-  
-  border: none;
-  
-  border-radius: 10px;
-  
-  padding: 15px 24px;
-  
-  font-size: 20px;
-  
-  cursor: pointer;
-  
-  transition: .2s;
-}
-
-.toolbar button:hover {
-  
-  background: #0f4fd6;
-}
-
-.toolbar button:active {
-  
-  transform: scale(.96);
+#imagePlayer.fade-out {
+  opacity: 0;
 }
 
 /* =========================
    Playlist
 ========================= */
-
 .playlistBox {
-  
   background: #2d2d2d;
-  
   border-radius: 12px;
-  
-  padding: 18px;
+  padding: 16px;
+  margin-bottom: 60px;
 }
 
 .playlistBox h2 {
-  
-  font-size: 34px;
-  
-  margin-bottom: 18px;
+  font-size: 28px;
+  margin-bottom: 14px;
 }
 
 #playlist {
-  
   list-style: none;
 }
 
 .playlistItem {
-  
   display: flex;
-  
   align-items: center;
-  
-  gap: 12px;
-  
+  gap: 10px;
   background: #3a3a3a;
-  
-  margin-bottom: 10px;
-  
-  padding: 12px;
-  
+  margin-bottom: 8px;
+  padding: 10px;
   border-radius: 8px;
 }
 
 .title {
-  
   flex: 1;
-  
   cursor: pointer;
-  
   word-break: break-word;
+  font-size: 15px;
 }
 
 .deleteBtn {
-  
   background: #e53935;
-  
   color: white;
-  
   border: none;
-  
   border-radius: 6px;
-  
-  padding: 6px 12px;
-  
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+#playlist li.active {
+  background: #1565ff;
+}
+
+/* =========================
+   Side Controls (Floating)
+========================= */
+.sideControls {
+  position: fixed;
+  right: 12px;
+  bottom: 70px;
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.sideBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #1565ff;
+  color: white;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.controlsPanel {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(0,0,0,0.85);
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.controlsPanel.show {
+  display: flex;
+}
+
+.controlsPanel button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1565ff;
+  color: white;
+  border: none;
+  font-size: 18px;
   cursor: pointer;
 }
 
-.deleteBtn:hover {
-  
-  background: #b71c1c;
+.controlsPanel button:active {
+  transform: scale(0.92);
 }
 
 /* =========================
-   Mobile
+   Settings Panel
 ========================= */
-
-@media(max-width:700px) {
-  
-  .logo {
-    
-    font-size: 22px;
-  }
-  
-  #statusText {
-    
-    font-size: 16px;
-  }
-  
-  .screen {
-    
-    height: 330px;
-  }
-  
-  #welcome h1 {
-    
-    font-size: 30px;
-  }
-  
-  #welcome p {
-    
-    font-size: 18px;
-  }
-  
-  .toolbar button {
-    
-    font-size: 18px;
-    
-    flex: 1;
-  }
-  
-  .playlistBox h2 {
-    
-    font-size: 28px;
-  }
-  
+.settingsPanel {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
-#playlist li.active {
+
+.settingsPanel.show {
+  display: flex;
+}
+
+.settingsBox {
+  background: #2d2d2d;
+  border-radius: 14px;
+  padding: 24px;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settingsBox h3 {
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.settingsBox button,
+.settingsBox input[type="text"],
+.settingsBox input[type="file"] {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+}
+
+.settingsBox button {
   background: #1565ff;
   color: white;
+  cursor: pointer;
+}
+
+.settingsBox label {
+  font-size: 14px;
+  color: #ccc;
 }
 
 /* =========================
-   Presentation Mode (Final)
+   Clock
 ========================= */
+.clock {
+  position: fixed;
+  top: 70px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+/* =========================
+   QR Box
+========================= */
+.qrBox {
+  position: fixed;
+  bottom: 60px;
+  left: 15px;                 /* दाएँ से बाएँ कर दिया */
+  background: white;
+  padding: 8px;
+  border-radius: 10px;
+  text-align: center;
+  z-index: 900;
+  display: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.qrBox img {
+  width: 90px;
+  height: 90px;
+  display: block;
+}
+
+.qrBox p {
+  color: #111;
+  font-size: 11px;
+  margin-top: 4px;
+  font-weight: bold;
+}
+
+/* =========================
+   Ticker
+========================= */
+.ticker-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #1565ff;
+  color: white;
+  overflow: hidden;
+  height: 42px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+}
+
+.ticker {
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: scroll-left 22s linear infinite;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* =========================
+   Presentation Mode
+========================= */
+.presentation-mode .topbar,
+.presentation-mode .playlistBox,
+.presentation-mode .container > .screen {
+  /* screen will be handled below */
+}
 
 .presentation-mode .topbar,
 .presentation-mode .playlistBox {
@@ -299,33 +352,20 @@ body {
   margin: 0;
 }
 
-.presentation-mode .toolbar {
-  position: fixed;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  background: transparent;
-  justify-content: center;
-  display: flex;
-  padding: 10px;
+.presentation-mode .clock {
+  top: 18px;
+  right: 18px;
+  font-size: 18px;
 }
 
-.presentation-mode .toolbar button {
-  display: none;
+.presentation-mode .qrBox {
+  display: block;
 }
 
-.presentation-mode #exitPresentationBtn {
-  display: inline-block;
-  background: #e53935 !important;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 15px 24px;
-  font-size: 20px;
+.presentation-mode .sideControls {
+  bottom: 60px;
 }
 
-/* वीडियो कंट्रोल छिपाना */
 .presentation-mode video {
   pointer-events: none;
 }
@@ -335,80 +375,8 @@ body {
   display: none !important;
 }
 
-.presentation-mode #imageDuration {
-  display: none !important;
-}
-
-.presentation-mode #tickerInput,
-.presentation-mode #tickerSaveBtn {
-  display: none !important;
-}
-
 /* =========================
-   Clock
-========================= */
-.clock {
-  position: fixed;
-  top: 70px;                  /* हेडर के नीचे */
-  right: 15px;
-  background: rgba(0, 0, 0, 0.75);
-  color: #ffffff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  z-index: 1000;
-  font-family: Arial, sans-serif;
-  white-space: nowrap;
-}
-
-.presentation-mode .clock {
-  top: 20px;
-  right: 20px;
-  font-size: 20px;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 10px 16px;
-}
-
-/* =========================
-   Ticker (Scrolling Text)
-========================= */
-.ticker-wrap {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: #1565ff;
-  color: white;
-  overflow: hidden;
-  height: 42px;
-  z-index: 999;
-  display: flex;
-  align-items: center;
-}
-
-.ticker {
-  white-space: nowrap;
-  padding-left: 100%;
-  animation: scroll-left 20s linear infinite;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-@keyframes scroll-left {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-.presentation-mode .ticker-wrap {
-  height: 48px;
-}
-
-.presentation-mode .ticker {
-  font-size: 20px;
-}
-/* =========================
-   Password Lock Screen
+   Password Lock
 ========================= */
 .lockScreen {
   position: fixed;
@@ -424,7 +392,7 @@ body {
 .lockBox {
   background: #2d2d2d;
   border-radius: 14px;
-  padding: 36px 30px;
+  padding: 36px 28px;
   text-align: center;
   width: 100%;
   max-width: 340px;
@@ -432,20 +400,19 @@ body {
 }
 
 .lockBox h2 {
-  font-size: 24px;
+  font-size: 22px;
   margin-bottom: 8px;
-  color: #fff;
 }
 
 .lockBox p {
   color: #cfcfcf;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   font-size: 15px;
 }
 
 .lockBox input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 12px;
   border-radius: 8px;
   border: none;
   font-size: 16px;
@@ -460,19 +427,32 @@ body {
   border: none;
   border-radius: 10px;
   padding: 13px;
-  font-size: 17px;
+  font-size: 16px;
   cursor: pointer;
-  transition: .2s;
-}
-
-.lockBox button:hover {
-  background: #0f4fd6;
 }
 
 .lockError {
   color: #ff5252;
   margin-top: 12px;
-  margin-bottom: 0;
   font-size: 14px;
   min-height: 18px;
+}
+
+/* =========================
+   Mobile
+========================= */
+@media (max-width: 700px) {
+  .logo {
+    font-size: 20px;
+  }
+  .screen {
+    height: 300px;
+  }
+  #welcome h1 {
+    font-size: 28px;
+  }
+  .sideBtn {
+    width: 44px;
+    height: 44px;
+  }
 }

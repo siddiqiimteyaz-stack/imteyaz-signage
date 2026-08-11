@@ -1,171 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>IMTEYAZ Barwa Online Shopping</title>
-
-<link rel="stylesheet" href="style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IMTEYAZ Barwa Online Shopping</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<!-- ========================= -->
-<!-- Password Lock Screen -->
-<!-- ========================= -->
-<div id="lockScreen" class="lockScreen">
+  <!-- Password Lock Screen -->
+  <div id="lockScreen" class="lockScreen">
     <div class="lockBox">
-        <h2>🔒 IMTEYAZ SHOPPING</h2>
-        <p>Password डालें</p>
-        <input type="password" id="lockPassword" placeholder="Password" autocomplete="off">
-        <button id="lockSubmitBtn">Unlock</button>
-        <p id="lockError" class="lockError"></p>
+      <h2>🔒 IMTEYAZ SHOPPING</h2>
+      <p>Password डालें</p>
+      <input type="password" id="lockPassword" placeholder="Password" autocomplete="off">
+      <button id="lockSubmitBtn">Unlock</button>
+      <p id="lockError" class="lockError"></p>
     </div>
-</div>
+  </div>
 
-<div id="appContent" class="appContent" style="display:none;">
+  <div id="appContent" class="appContent" style="display:none;">
 
-<header class="topbar">
+    <header class="topbar">
+      <div class="logo">IMTEYAZ SHOPPING 🛍️</div>
+      <div id="statusText">Ready</div>
+    </header>
 
-    <div class="logo">
-        IMTEYAZ SHOPPING 🛍️ 
+    <div id="clock" class="clock">--:--:--</div>
+
+    <!-- QR Code (Presentation में दिखेगा) -->
+    <div id="qrBox" class="qrBox">
+      <img id="qrImage" src="" alt="QR Code">
+      <p>Scan for Offers</p>
     </div>
 
-    <div id="statusText">
-        Ready
-    </div>
+    <div class="container">
 
-</header>
-
-<div id="clock" class="clock">--:--:--</div>
-
-
-<div class="container">
-
-    <!-- ========================= -->
-    <!-- Player Screen -->
-    <!-- ========================= -->
-
-    <div class="screen">
-
+      <div class="screen">
         <div id="welcome">
-
-            <h1>Digital Signage System</h1>
-
-            <p>
-                Tap Add Media to create your playlist
-            </p>
-
+          <h1>Digital Signage System</h1>
+          <p>Tap Add Media to create your playlist</p>
         </div>
+        <img id="imagePlayer" alt="Image">
+        <video id="videoPlayer"></video>
+      </div>
 
-        <img
-            id="imagePlayer"
-            alt="Image">
+      <!-- साइड फ्लोटिंग कंट्रोल बटन -->
+      <div id="sideControls" class="sideControls">
+        <button id="toggleControlsBtn" class="sideBtn">☰</button>
+        <div id="controlsPanel" class="controlsPanel">
+          <button id="playBtn" title="Play">▶</button>
+          <button id="pauseBtn" title="Pause">⏸</button>
+          <button id="prevBtn" title="Previous">⏮</button>
+          <button id="nextBtn" title="Next">⏭</button>
+          <button id="muteBtn" title="Mute">🔇</button>
+          <button id="fullscreenBtn" title="Presentation">⛶</button>
+          <button id="exitPresentationBtn" title="Exit">✕</button>
+          <button id="settingsBtn" title="Settings">⚙️</button>
+        </div>
+      </div>
 
-        <video
-            id="videoPlayer"
-            controls>
-        </video>
+      <!-- सेटिंग्स पैनल (पासवर्ड से लॉक) -->
+      <div id="settingsPanel" class="settingsPanel">
+        <div class="settingsBox">
+          <h3>Settings</h3>
+          <button id="addBtn">➕ Add Media</button>
+          <button id="saveBtn">💾 Save Playlist</button>
+          <button id="loadBtn">📂 Load Playlist</button>
+          
+          <label>QR Code Image:</label>
+          <input type="file" id="qrFile" accept="image/*">
+          
+          <input type="text" id="tickerInput" placeholder="Ticker मैसेज लिखें...">
+          <button id="tickerSaveBtn">Save Ticker</button>
+          
+          <button id="closeSettingsBtn">Close</button>
+        </div>
+      </div>
 
-    </div>
+      <!-- Hidden File Pickers -->
+      <input type="file" id="filePicker" accept="image/*,video/*" multiple hidden>
+      <input type="file" id="playlistLoader" multiple accept="image/*,video/*" style="display:none;">
 
-
-    <!-- ========================= -->
-    <!-- Toolbar -->
-    <!-- ========================= -->
-
-    <div class="toolbar">
-
-        <button id="addBtn">
-            ➕ Add Media
-        </button>
-
-        <button id="playBtn">
-            ▶ Play
-        </button>
-
-        <button id="pauseBtn">
-            ⏸ Pause
-        </button>
-
-        <button id="prevBtn">
-            ⏮ Prev
-        </button>
-
-        <button id="nextBtn">
-            ⏭ Next
-        </button>
-        
-        <button id="saveBtn">💾 Save</button>
-
-<button id="loadBtn">📂 Load</button>
-
-<button id="fullscreenBtn">⛶ Presentation</button>
-
-<select id="imageDuration">
-    <option value="3">Image: 3 sec</option>
-    <option value="5" selected>Image: 5 sec</option>
-    <option value="8">Image: 8 sec</option>
-    <option value="10">Image: 10 sec</option>
-    <option value="15">Image: 15 sec</option>
-</select>
-
-<button id="muteBtn">🔇 Mute</button>
-
-<button id="exitPresentationBtn">Exit Presentation</button>
-
-<input type="text" id="tickerInput" placeholder="यहाँ अपना मैसेज लिखें..." style="width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: none; font-size: 16px;">
-<button id="tickerSaveBtn">Save Ticker</button>
-
-<div class="ticker-wrap">
-    <div class="ticker" id="tickerText">हमारे दुकान में आपका स्वागत है • आज का विशेष ऑफर • धन्यवाद</div>
-</div>
+      <div class="playlistBox">
+        <h2>Playlist</h2>
+        <ul id="playlist"></ul>
+      </div>
 
     </div>
 
-
-    <!-- Hidden File Picker -->
-
-    <input
-        type="file"
-        id="filePicker"
-        accept="image/*,video/*"
-        multiple
-        hidden>
-    <input
-    type="file"
-    id="playlistLoader"
-    multiple
-    accept="image/*,video/*"
-    style="display:none;">
-
-
-    <!-- ========================= -->
-    <!-- Playlist -->
-    <!-- ========================= -->
-
-    <div class="playlistBox">
-
-        <h2>
-            Playlist
-        </h2>
-
-        <ul id="playlist">
-
-        </ul>
-
+    <!-- Ticker -->
+    <div class="ticker-wrap">
+      <div class="ticker" id="tickerText">हमारे दुकान में आपका स्वागत है • आज का विशेष ऑफर • धन्यवाद</div>
     </div>
 
-</div>
+  </div><!-- /appContent -->
 
-</div><!-- /appContent -->
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
-
 </html>
